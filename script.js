@@ -75,3 +75,34 @@ const mousePosition = debounce((e) => {
 }, 300);
 
 document.addEventListener("mousemove", mousePosition);
+
+// 5) Create a Input in html, when user typing something on it you should fetch data from this API: https://dummyjson.com/products/search?q=phone as you see there is a products where you can searching something. Replace 'phone' to user typed value and display the result, use debaunce technique to optimize performance.
+
+const input = document.getElementById("search");
+const results = document.getElementById("results");
+
+function debounce(func, delay) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), delay);
+  };
+}
+
+async function fetchData(query) {
+  if (!query.trim()) {
+    results.innerHTML = "";
+    return;
+  }
+
+  const response = await fetch(
+    `https://dummyjson.com/products/search?q=${query}`
+  );
+  const data = await response.json();
+  const products = data.products;
+
+  results.innerHTML = products.map((p) => `<div>${p.title}</div>`).join("");
+}
+
+const debouncedFetch = debounce((e) => fetchData(e.target.value), 300);
+input.addEventListener("input", debouncedFetch);
